@@ -16,40 +16,22 @@ for line in INPUT:
 def get_closest(x, y, points):
     dis = [abs(p[0] - x) + abs(p[1] - y) for p in points]
     if dis.count(min(dis)) > 1:
-        return -1
-    return dis.index(min(dis))
-
-
-def get_total(x, y, points):
-    return sum([abs(p[0] - x) + abs(p[1] - y) for p in points])
+        return -1, sum(dis)
+    return dis.index(min(dis)), sum(dis)
 
 
 dists = [0 for _ in points]
 dists.append(0)
 edges = set()
-for i in range(bbox[2] - bbox[0] + 1):
-    for j in range(bbox[3] - bbox[1] + 1):
-        p = get_closest(i + bbox[0], j + bbox[1], points)
-        dists[p] += 1
-
-for i in range(bbox[2] - bbox[0]):
-    edges.add(get_closest(i + bbox[0], bbox[1], points))
-
-for i in range(bbox[3] - bbox[1]):
-    edges.add(get_closest(bbox[0], i + bbox[1], points))
-
-for i in range(bbox[2] - bbox[0]):
-    edges.add(get_closest(i + bbox[0], bbox[3], points))
-
-for i in range(bbox[3] - bbox[1]):
-    edges.add(get_closest(bbox[2], i + bbox[1], points))
-
 area = 0
 for i in range(bbox[2] - bbox[0] + 1):
     for j in range(bbox[3] - bbox[1] + 1):
-        t = get_total(i + bbox[0], j + bbox[1], points)
-        if t < 10000:
+        p, s = get_closest(i + bbox[0], j + bbox[1], points)
+        if i == 0 or j == 0 or i == bbox[2] or j == bbox[3]:
+            edges.add(p)
+        if s < 10000:
             area += 1
+        dists[p] += 1
 dists[-1] = 0
 for i in edges:
     dists[i] = 0

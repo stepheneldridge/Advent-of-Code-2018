@@ -24,11 +24,7 @@ def get_len(data):
 
 
 def remove_letter(data, letter):
-    while letter in data:
-        data.remove(letter)
-    while (letter + 32) in data:
-        data.remove(letter + 32)
-    return data
+    return [a for a in data if a != letter and a != letter + 32]
 
 
 print("part_1:", get_len(data.copy()))

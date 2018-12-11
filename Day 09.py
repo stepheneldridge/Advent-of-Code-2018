@@ -1,5 +1,4 @@
 # Day 9
-# Tyler add discord: Areus#8910
 import re
 INPUT = open('Day 09.txt', 'r')
 data = []

@@ -29,8 +29,30 @@ def max_for_size(size):
     return m, v[m]
 
 
+def max_for_coord(x, y):
+    sizes = min(300 - x, 300 - y)
+    size = 0
+    value = 0
+    best_value = 0
+    for s in range(sizes):
+        for i in range(s):
+            value += batteries[x + s][y + i]
+        for i in range(s):
+            value += batteries[x + i][y + s]
+        value += batteries[x + s][y + s]
+        if value > best_value:
+            best_value = value
+            size = s + 1
+    return "%s,%s,%s" % (x, y, size), best_value
+
+
 print("part_1:", max_for_size(3)[0][:-2])
-values = []
-for s in range(300):
-    values.append(max_for_size(s + 1))
-print("part_2:", max(values, key=lambda a: values[a]))
+value = 0
+key = ""
+for x in range(300):
+    for y in range(300):
+        r = max_for_coord(x, y)
+        if r[1] > value:
+            value = r[1]
+            key = r[0]
+print("part_2:", key)

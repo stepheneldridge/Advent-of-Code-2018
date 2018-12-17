@@ -8,38 +8,30 @@ miny = 2 << 10
 maxx = 0
 maxy = 0
 for line in INPUT:
+    m = list(map(int, re.findall(r"\-?\d+", line)))
     if line.startswith('x'):
-        xd.append(list(map(int, re.findall(r"\-?\d+", line))))
-        if xd[-1][0] > maxx:
-            maxx = xd[-1][0]
-        if xd[-1][0] < minx:
-            minx = xd[-1][0]
-        if max(xd[-1][1:]) > maxy:
-            maxy = min(xd[-1][1:])
-        if min(xd[-1][1:]) < miny:
-            miny = min(xd[-1][1:])
+        xd.append(m)
+        if m[0] > maxx:
+            maxx = m[0]
+        if m[0] < minx:
+            minx = m[0]
+        if max(m[1:]) > maxy:
+            maxy = min(m[1:])
+        if min(m[1:]) < miny:
+            miny = min(m[1:])
     elif line.startswith('y'):
-        yd.append(list(map(int, re.findall(r"\-?\d+", line))))
-        if yd[-1][0] > maxy:
-            maxy = yd[-1][0]
-        if yd[-1][0] < miny:
-            miny = yd[-1][0]
-        if max(yd[-1][1:]) > maxx:
-            maxx = min(yd[-1][1:])
-        if min(yd[-1][1:]) < minx:
-            minx = min(yd[-1][1:])
+        yd.append(m)
+        if m[0] > maxy:
+            maxy = m[0]
+        if m[0] < miny:
+            miny = m[0]
+        if max(m[1:]) > maxx:
+            maxx = min(m[1:])
+        if min(m[1:]) < minx:
+            minx = min(m[1:])
 minx -= 1
 maxx += 1
 miny -= 1
-
-
-def print_grid(g):
-    for y in g:
-        for x in y:
-            print(x, end='')
-        print()
-
-
 grid = [['.' for _ in range(maxx - minx + 1)] for _ in range(maxy - miny + 1)]
 for i in xd:
     for j in range(i[1], i[2] + 1):
@@ -49,22 +41,11 @@ for i in yd:
         grid[i[0] - miny][j - minx] = '#'
 
 
-def count_water(x, y, grid):
-    count = 0
-    if y >= len(grid):
-        return 0, True
-    fall = False
-    if grid[y][x] == '.':
-        c, f = count_water(x, y + 1, grid)
-        count += c
-        fall = f
-        if not f:
-            c, f = count_water(x - 1, y, grid)
-            count += c
-            c, g = count_water(x + 1, y, grid)
-            count += c
-            fall = f or g
-    return count, fall
+def print_grid(g):
+    for y in g:
+        for x in y:
+            print(x, end='')
+        print()
 
 
 def get(p):
@@ -80,7 +61,6 @@ def setc(p, v):
 current = [500 - minx, 0]
 state = None
 while state != 'finished':
-    # print(state, get(current))
     if state is None:
         if get(current) == '.':
             setc(current, '|')
@@ -164,7 +144,11 @@ while state != 'finished':
         if get(current) == '>' or get(current) == '*':
             setc(current, '|')
             current[0] -= 1
-        elif get(current) == '~' or get(current) == '|':
+        elif get(current) == '~':
+            setc(current, '^')
+            current[0] -= 1
+            state = 'leftsurface'
+        elif get(current) == '|':
             current[1] -= 1
             state = 'up'
     elif state == 'leftreverse':
@@ -172,7 +156,7 @@ while state != 'finished':
             setc(current, '|')
             current[0] += 1
         elif get(current) == '.':
-            setc(current, '>')
+            setc(current, '*')
             current[0] += 1
             state = 'rightsurface'
         elif get(current) == '~':
@@ -185,25 +169,25 @@ while state != 'finished':
         elif get(current) == '#':
             current[0] -= 1
             state = 'rightbacktrack'
-
-count = 0
+    elif state == 'leftsurface':
+        if get(current) == '~':
+            setc(current, '|')
+            current[0] -= 1
+        elif get(current) == '#':
+            current[0] += 1
+            state = 'returntocenter'
+    elif state == 'returntocenter':
+        if get(current) == '|':
+            current[0] += 1
+        elif get(current) == '^':
+            setc(current, '|')
+            current[1] -= 1
+            state = 'up'
+count_stable = 0
+count_unstable = 0
 for y in grid[1:]:
-    count += y.count('~')
-    count += y.count('|')
-print("part_1:", count)
-for y in range(len(grid)):
-    while True:
-        change = False
-        for x in range(len(grid[y])):
-            if get([x, y]) == '~':
-                if get([x + 1, y]) == '|' or get([x - 1, y]) == '|':
-                    setc([x, y], '|')
-                    change = True
-        if not change:
-            break
-
-count = 0
-for y in grid[1:]:
-    count += y.count('~')
-print("part_2:", count)
+    count_stable += y.count('~')
+    count_unstable += y.count('|')
+print("part_1:", count_stable + count_unstable)
+print("part_2:", count_stable)
 INPUT.close()

@@ -190,7 +190,20 @@ count = 0
 for y in grid[1:]:
     count += y.count('~')
     count += y.count('|')
-print(count)
+print("part_1:", count)
+for y in range(len(grid)):
+    while True:
+        change = False
+        for x in range(len(grid[y])):
+            if get([x, y]) == '~':
+                if get([x + 1, y]) == '|' or get([x - 1, y]) == '|':
+                    setc([x, y], '|')
+                    change = True
+        if not change:
+            break
 
-
+count = 0
+for y in grid[1:]:
+    count += y.count('~')
+print("part_2:", count)
 INPUT.close()

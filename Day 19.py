@@ -109,8 +109,8 @@ for _ in range(100):
     reg = p[0](reg, *p[1:])
     reg[pointer] += 1
 value = 0
-x = reg.index(max(reg))
-for i in range(1, int(sqrt(reg[x]))):
-    if reg[x] % i == 0:
-        value += i + reg[x] // i
+x = max(reg)
+for i in range(1, int(sqrt(x))):
+    if x % i == 0:
+        value += i + x // i
 print("part_2:", value)

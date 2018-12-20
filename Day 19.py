@@ -110,7 +110,7 @@ for _ in range(100):
     reg[pointer] += 1
 value = 0
 x = max(reg)
-for i in range(1, int(sqrt(x))):
+for i in range(1, int(sqrt(x)) + 1):
     if x % i == 0:
         value += i + x // i
 print("part_2:", value)

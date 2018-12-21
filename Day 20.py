@@ -1,4 +1,5 @@
 # Day 20
+from collections import defaultdict
 INPUT = open('Day 20.txt', 'r').read().split('\n')[0].strip()
 key = ""
 data = []
@@ -47,7 +48,7 @@ def get_path(subtree):
         elif isinstance(i, tuple):
             a = get_path(i[0])
             b = get_path(i[1])
-            if a == '' or b == '':
+            if b == '':
                 continue
             else:
                 path += max(a, b, key=lambda a: len(a))
@@ -56,3 +57,23 @@ def get_path(subtree):
 
 path = get_path(tree)
 print("part_1:", len(path))
+
+vectors = {"N": -1j, "E": 1, "S": 1j, "W": -1}
+stack = []
+paths = defaultdict(lambda: 1 << 10)
+prev = 0
+x = 0
+paths[0] = 0
+for c in INPUT[1:-2]:
+    if c == "(":
+        stack += [x]
+    elif c == ")":
+        x = stack.pop()
+    elif c == "|":
+        x = stack[-1]
+    else:
+        x += vectors[c]
+        paths[x] = min(paths[x], paths[prev] + 1)
+    prev = x
+v = paths.values()
+print("part_2:", sum(x >= 1000 for x in v))

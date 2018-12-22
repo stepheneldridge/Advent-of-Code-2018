@@ -29,7 +29,7 @@ for x in range(len(grid)):
 print("part_1:", total)
 
 
-def dijkstra(start, goal, data):
+def a_star(start, goal, data):
     neighbors = []
     for i in [[1, 0], [-1, 0], [0, 1], [0, -1]]:
         for j in range(3):
@@ -37,6 +37,9 @@ def dijkstra(start, goal, data):
 
     def cost_to(p1, p2):
         return 1 if p1[2] == p2[2] else 8
+
+    def h(p1, p2):
+        return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
 
     def is_valid(p):
         if p[0] < 0 or p[1] < 0:
@@ -46,23 +49,26 @@ def dijkstra(start, goal, data):
         if data[p[0]][p[1]] == p[2]:
             return False
         return True
-    explore = [(0, start)]
     score = defaultdict(lambda: 1e9)
     score[start] = 0
+    fscore = defaultdict(lambda: 1e9)
+    fscore[start] = h(start, goal)
+    explore = [(fscore[start], start)]
     while len(explore) > 0:
         c, current = heappop(explore)
         if current == goal:
             return c
-        if c > score[current]:
+        if c > fscore[current]:
             continue
         for i in neighbors:
             neighbor = (current[0] + i[0], current[1] + i[1], i[2])
             if not is_valid(neighbor) or data[current[0]][current[1]] == i[2]:
                 continue
-            cost = c + cost_to(current, neighbor)
+            cost = score[current] + cost_to(current, neighbor)
             if cost < score[neighbor]:
-                heappush(explore, (cost, neighbor))
+                fscore[neighbor] = cost + h(neighbor, goal)
                 score[neighbor] = cost
+                heappush(explore, (fscore[neighbor], neighbor))
 
 
-print("part_2:", dijkstra((0, 0, 1), target, grid))
+print("part_2:", a_star((0, 0, 1), target, grid))

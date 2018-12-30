@@ -80,7 +80,7 @@ while state != 'finished':
             current[1] -= 1
             state = 'up'
     elif state == 'backup':
-        if get(current) == '|':
+        if get(current) == '|' or get(current) == '<':
             setc(current, '<')
             current[0] -= 1
             state = 'left'
@@ -99,11 +99,15 @@ while state != 'finished':
             current[0] += 1
             state = 'right'
         elif get(current) == '|':
+            setc(current, '<')
             current[1] += 1
             state = 'down'
         elif get(current) == '>':
             current[0] += 1
             state = 'right'
+        elif get(current) == '*':
+            current[0] += 1
+            state = 'rightsurface'
     elif state == 'right':
         if get(current) == '<':
             setc(current, '~')
@@ -135,11 +139,15 @@ while state != 'finished':
             setc(current, '|')
             current[0] -= 1
             state = 'rightreverse'
-        elif get(current) == '.':
+        elif get(current) == '.' or get(current) == '#':
             current[1] += 1
             state = 'leftreverse'
         elif get(current) is None:
             state = 'finished'
+        elif get(current) == '<':
+            setc(current, '|')
+            current[0] += 1
+            state = 'leftreverse'
     elif state == 'rightreverse':
         if get(current) == '>' or get(current) == '*':
             setc(current, '|')
@@ -157,10 +165,13 @@ while state != 'finished':
             current[0] += 1
         elif get(current) == '.':
             setc(current, '*')
-            current[0] += 1
-            state = 'rightsurface'
+            current[1] += 1
+            state = 'down'
         elif get(current) == '~':
             state = 'finished'
+        elif get(current) == '#':
+            current[0] -= 1
+            state = 'up'
     elif state == 'rightsurface':
         if get(current) == '.':
             setc(current, '*')
